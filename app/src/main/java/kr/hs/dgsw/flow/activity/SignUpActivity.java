@@ -6,17 +6,38 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 import kr.hs.dgsw.flow.R;
+import kr.hs.dgsw.flow.interfaces.FlowService;
+import kr.hs.dgsw.flow.model.Profile;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
 
 public class SignUpActivity extends AppCompatActivity {
+
+    private Profile profile;
+
+    /**
+     * Android UI module value
+     */
+
     private Spinner genderSpinner;
     private Spinner classSpinner;
     private Spinner numberSpinner;
+
+    private Button signupBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +45,20 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
 
         setSpinnerItem();
+
+        signupBtn = findViewById(R.id.signupBtn);
+
+        signupBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                retrofitTest();
+            }
+        });
     }
+
+    /**
+     * 스피너 메뉴 아이템 설정 및 이벤트 리스너 등록
+     */
 
     private void setSpinnerItem() {
 
@@ -92,5 +126,25 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
+    private void retrofitTest() {
+        Retrofit retrofit = new Retrofit.Builder()
+            .baseUrl("http://10.80.163.99:4000/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build();
 
+        FlowService service = retrofit.create(FlowService.class);
+        Call<JSONObject> request = service.getTest();
+
+        request.enqueue(new Callback<JSONObject>() {
+            @Override
+            public void onResponse(Call<JSONObject> call, Response<JSONObject> response) {
+                Log.d("response", String.valueOf(response));
+            }
+
+            @Override
+            public void onFailure(Call<JSONObject> call, Throwable t) {
+                Log.d("response", String.valueOf(t));
+            }
+        });
+    }
 }

@@ -31,7 +31,8 @@
             android:name=".activity.SignInActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.SignUpActivity" />
+            android:name=".activity.SignUpActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
