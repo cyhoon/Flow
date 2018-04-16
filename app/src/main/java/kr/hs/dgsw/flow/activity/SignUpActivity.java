@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -15,19 +16,18 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import kr.hs.dgsw.flow.R;
+import kr.hs.dgsw.flow.helper.Validation;
 import kr.hs.dgsw.flow.interfaces.FlowService;
-import kr.hs.dgsw.flow.model.Profile;
+import kr.hs.dgsw.flow.model.User;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.GET;
-import retrofit2.http.Path;
 
 public class SignUpActivity extends AppCompatActivity {
 
-    private Profile profile;
+    private User user;
 
     /**
      * Android UI module value
@@ -39,21 +39,127 @@ public class SignUpActivity extends AppCompatActivity {
 
     private Button signupBtn;
 
+    private EditText emailTxt;
+    private EditText passwordTxt;
+    private EditText passwordReTxt;
+    private EditText nameTxt;
+    private EditText mobileTxt;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
-        setSpinnerItem();
-
-        signupBtn = findViewById(R.id.signupBtn);
+        setViewId();
 
         signupBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                retrofitTest();
+                verifySignUpData();
             }
         });
+    }
+
+    /**
+     * @description
+     *
+     * 서버로 보낼 회원가입 데이터들을 검증한다.
+     */
+    private void verifySignUpData() {
+        String email = emailTxt.getText().toString();
+        String password = passwordTxt.getText().toString();
+        String passwordRe = passwordReTxt.getText().toString();
+        String name = nameTxt.getText().toString();
+        String mobile = mobileTxt.getText().toString();
+        String gender = genderSpinner.getSelectedItem().toString();
+        String classRoom = classSpinner.getSelectedItem().toString();
+        String classNumber = numberSpinner.getSelectedItem().toString();
+
+        switch (classRoom) {
+            case "3학년 1반":
+                classRoom = "1";
+                break;
+            case "3학년 2반":
+                classRoom = "2";
+                break;
+            default:
+                classRoom = "1";
+        }
+
+        if (!Validation.isValidEmail(email)) {
+            Toast.makeText(getApplicationContext(), "이메일이 올바르지 않습니다.", Toast.LENGTH_SHORT).show();
+            emailTxt.requestFocus();
+            return;
+        }
+
+        if (!Validation.isValidPassword(password)) {
+            Toast.makeText(getApplicationContext(), "비밀번호는 ( 소문자, 대문자, 특수문자 포함해서 8~16 이어야 합니다. )", Toast.LENGTH_SHORT).show();
+            passwordTxt.requestFocus();
+            return;
+        }
+
+        if (Validation.isBeEmptyValue(password)) {
+            Toast.makeText(getApplicationContext(), "비밀번호가 입력되지 않았습니다.", Toast.LENGTH_SHORT).show();
+            passwordTxt.requestFocus();
+            return;
+        }
+
+        if (Validation.isBeEmptyValue(passwordRe)) {
+            Toast.makeText(getApplicationContext(), "비밀번호 재입력이 입력되지 않았습니다.", Toast.LENGTH_SHORT).show();
+            passwordReTxt.requestFocus();
+            return;
+        }
+
+        if (!Validation.isComparingPassword(password, passwordRe)) {
+            Toast.makeText(getApplicationContext(), "비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
+            passwordReTxt.requestFocus();
+            return;
+        }
+
+        if (Validation.isBeEmptyValue(name)) {
+            Toast.makeText(getApplicationContext(), "이름이 입력되지 않았습니다.", Toast.LENGTH_SHORT).show();
+            nameTxt.requestFocus();
+            return;
+        }
+
+        if (Validation.isBeEmptyValue(mobile)) {
+            Toast.makeText(getApplicationContext(), "전화 번호가 입력되지 않았습니다.", Toast.LENGTH_SHORT).show();
+            mobileTxt.requestFocus();
+            return;
+        }
+    }
+
+    /**
+     * @description
+     *
+     *  View ID 객체들을 가르킨다.
+     *  Spinner 아이템들을 셋팅하는 함수를 호출
+     */
+
+    private void setViewId() {
+
+        /**
+         * Button dependencies
+         */
+        signupBtn = findViewById(R.id.signupBtn);
+
+        /**
+        * EditText dependencies
+        */
+        emailTxt = findViewById(R.id.emailTxt);
+        passwordTxt = findViewById(R.id.passwordTxt);
+        passwordReTxt = findViewById(R.id.passwordReTxt);
+        nameTxt = findViewById(R.id.nameTxt);
+        mobileTxt = findViewById(R.id.mobileTxt);
+
+        /**
+         *  Spinner dependencies
+         */
+        genderSpinner = (Spinner)findViewById(R.id.gender_spinner);
+        classSpinner = (Spinner)findViewById(R.id.class_spinner);
+        numberSpinner = (Spinner)findViewById(R.id.number_spinner);
+
+        setSpinnerItem(); // Set Spinner Item
     }
 
     /**
@@ -65,10 +171,6 @@ public class SignUpActivity extends AppCompatActivity {
         ArrayAdapter genderSpinnerAdapter;
         ArrayAdapter classSpinnerAdapter;
         ArrayAdapter numberSpinnerAdapter;
-
-        genderSpinner = (Spinner)findViewById(R.id.gender_spinner);
-        classSpinner = (Spinner)findViewById(R.id.class_spinner);
-        numberSpinner = (Spinner)findViewById(R.id.number_spinner);
 
         ArrayList<String> genderList = new ArrayList<>();
         genderList.add("남성");
@@ -88,42 +190,6 @@ public class SignUpActivity extends AppCompatActivity {
         genderSpinner.setAdapter(genderSpinnerAdapter);
         classSpinner.setAdapter(classSpinnerAdapter);
         numberSpinner.setAdapter(numberSpinnerAdapter);
-
-        genderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        classSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        numberSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
     }
 
     private void retrofitTest() {

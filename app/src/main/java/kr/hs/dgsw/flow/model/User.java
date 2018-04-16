@@ -1,28 +1,13 @@
 package kr.hs.dgsw.flow.model;
 
-/**
- * My Profile DATA Model
- */
-
-public class Profile {
-
-    private  String token;
+public class User {
     private String email;
     private String name;
     private String gender;
     private String mobile;
+    private String token;
     private int auth;
-    private int grade;
-    private int my_class;
-    private int my_class_number;
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
+    private myClass myClass;
 
     public String getEmail() {
         return email;
@@ -64,27 +49,11 @@ public class Profile {
         this.auth = auth;
     }
 
-    public int getGrade() {
-        return grade;
+    public kr.hs.dgsw.flow.model.myClass getMyClass() {
+        return myClass;
     }
 
-    public void setGrade(int grade) {
-        this.grade = grade;
-    }
-
-    public int getMy_class() {
-        return my_class;
-    }
-
-    public void setMy_class(int my_class) {
-        this.my_class = my_class;
-    }
-
-    public int getMy_class_number() {
-        return my_class_number;
-    }
-
-    public void setMy_class_number(int my_class_number) {
-        this.my_class_number = my_class_number;
+    public void setMyClass(kr.hs.dgsw.flow.model.myClass myClass) {
+        this.myClass = myClass;
     }
 }
