@@ -1,15 +1,9 @@
 package kr.hs.dgsw.flow.model;
 
-public class myClass {
+public class MyClass {
     private int grade;
     private int class_room;
     private int class_number;
-
-    public myClass(int grade, int class_room, int class_number) {
-        this.grade = grade;
-        this.class_room = class_room;
-        this.class_number = class_number;
-    }
 
     public int getGrade() {
         return grade;

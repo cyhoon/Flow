@@ -4,21 +4,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 import kr.hs.dgsw.flow.R;
-import kr.hs.dgsw.flow.helper.Validation;
 import kr.hs.dgsw.flow.interfaces.FlowService;
+import kr.hs.dgsw.flow.model.ResponseFormat;
 import kr.hs.dgsw.flow.model.User;
+import kr.hs.dgsw.flow.model.request.UserSignUp;
+import kr.hs.dgsw.flow.model.response.UserResponseFormat;
+import kr.hs.dgsw.flow.network.RetrofitSingleton;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -86,52 +88,60 @@ public class SignUpActivity extends AppCompatActivity {
                 classRoom = "1";
         }
 
-        if (!Validation.isValidEmail(email)) {
-            Toast.makeText(getApplicationContext(), "이메일이 올바르지 않습니다.", Toast.LENGTH_SHORT).show();
-            emailTxt.requestFocus();
-            return;
-        }
-
-        if (!Validation.isValidPassword(password)) {
-            Toast.makeText(getApplicationContext(), "비밀번호는 ( 소문자, 대문자, 특수문자 포함해서 8~16 이어야 합니다. )", Toast.LENGTH_SHORT).show();
-            passwordTxt.requestFocus();
-            return;
-        }
-
-        if (Validation.isBeEmptyValue(password)) {
-            Toast.makeText(getApplicationContext(), "비밀번호가 입력되지 않았습니다.", Toast.LENGTH_SHORT).show();
-            passwordTxt.requestFocus();
-            return;
-        }
-
-        if (Validation.isBeEmptyValue(passwordRe)) {
-            Toast.makeText(getApplicationContext(), "비밀번호 재입력이 입력되지 않았습니다.", Toast.LENGTH_SHORT).show();
-            passwordReTxt.requestFocus();
-            return;
-        }
-
-        if (!Validation.isComparingPassword(password, passwordRe)) {
-            Toast.makeText(getApplicationContext(), "비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
-            passwordReTxt.requestFocus();
-            return;
-        }
-
-        if (Validation.isBeEmptyValue(name)) {
-            Toast.makeText(getApplicationContext(), "이름이 입력되지 않았습니다.", Toast.LENGTH_SHORT).show();
-            nameTxt.requestFocus();
-            return;
-        }
-
-        if (Validation.isBeEmptyValue(mobile)) {
-            Toast.makeText(getApplicationContext(), "전화 번호가 입력되지 않았습니다.", Toast.LENGTH_SHORT).show();
-            mobileTxt.requestFocus();
-            return;
-        }
+//        if (!Validation.isValidEmail(email)) {
+//            Toast.makeText(getApplicationContext(), "이메일이 올바르지 않습니다.", Toast.LENGTH_SHORT).show();
+//            emailTxt.requestFocus();
+//            return;
+//        }
+//
+//        if (!Validation.isValidPassword(password)) {
+//            Toast.makeText(getApplicationContext(), "비밀번호는 ( 소문자, 대문자, 특수문자 포함해서 8~16 이어야 합니다. )", Toast.LENGTH_SHORT).show();
+//            passwordTxt.requestFocus();
+//            return;
+//        }
+//
+//        if (Validation.isBeEmptyValue(password)) {
+//            Toast.makeText(getApplicationContext(), "비밀번호가 입력되지 않았습니다.", Toast.LENGTH_SHORT).show();
+//            passwordTxt.requestFocus();
+//            return;
+//        }
+//
+//        if (Validation.isBeEmptyValue(passwordRe)) {
+//            Toast.makeText(getApplicationContext(), "비밀번호 재입력이 입력되지 않았습니다.", Toast.LENGTH_SHORT).show();
+//            passwordReTxt.requestFocus();
+//            return;
+//        }
+//
+//        if (!Validation.isComparingPassword(password, passwordRe)) {
+//            Toast.makeText(getApplicationContext(), "비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
+//            passwordReTxt.requestFocus();
+//            return;
+//        }
+//
+//        if (Validation.isBeEmptyValue(name)) {
+//            Toast.makeText(getApplicationContext(), "이름이 입력되지 않았습니다.", Toast.LENGTH_SHORT).show();
+//            nameTxt.requestFocus();
+//            return;
+//        }
+//
+//        if (Validation.isBeEmptyValue(mobile)) {
+//            Toast.makeText(getApplicationContext(), "전화 번호가 입력되지 않았습니다.", Toast.LENGTH_SHORT).show();
+//            mobileTxt.requestFocus();
+//            return;
+//        }
 
         // encrypt password
         // set request model object.
+        UserSignUp userSignUpData = new UserSignUp();
+        userSignUpData.setEmail(email);
+        userSignUpData.setPw(password);
+        userSignUpData.setName(name);
+        userSignUpData.setGender(gender);
+        userSignUpData.setMobile(mobile);
+        userSignUpData.setClassIdx(classRoom);
+        userSignUpData.setClassNumber(classNumber);
 
-
+        signUp(userSignUpData);
     }
 
     /**
@@ -197,24 +207,30 @@ public class SignUpActivity extends AppCompatActivity {
         numberSpinner.setAdapter(numberSpinnerAdapter);
     }
 
-    private void retrofitTest() {
-        Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://10.80.163.99:4000/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
+    private void signUp(UserSignUp userSignUpData) {
+        FlowService service = RetrofitSingleton.getInstance();
+        Call<ResponseFormat> request = service.signUp(userSignUpData);
 
-        FlowService service = retrofit.create(FlowService.class);
-        Call<JSONObject> request = service.getTest();
-
-        request.enqueue(new Callback<JSONObject>() {
+        request.enqueue(new Callback<ResponseFormat>() {
             @Override
-            public void onResponse(Call<JSONObject> call, Response<JSONObject> response) {
-                Log.d("response", String.valueOf(response));
+            public void onResponse(Call<ResponseFormat> call, Response<ResponseFormat> response) {
+                ResponseFormat rf = response.body();
+
+                switch (rf.getStatus()) {
+                    case 200: // 성공
+                        break;
+                    case 400:
+                        break;
+                    case 401:
+                        break;
+                    default:
+                        break;
+                }
             }
 
             @Override
-            public void onFailure(Call<JSONObject> call, Throwable t) {
-                Log.d("response", String.valueOf(t));
+            public void onFailure(Call<ResponseFormat> call, Throwable t) {
+
             }
         });
     }
