@@ -1,9 +1,5 @@
 package kr.hs.dgsw.flow.model;
 
-/**
- * Created by ihell on 2018-04-16.
- */
-
 public class myClass {
     private int grade;
     private int class_room;

@@ -67,8 +67,8 @@ public class SignUpActivity extends AppCompatActivity {
      */
     private void verifySignUpData() {
         String email = emailTxt.getText().toString();
-        String password = passwordTxt.getText().toString();
-        String passwordRe = passwordReTxt.getText().toString();
+        String password = passwordTxt.getText().toString(); // abcDe23@#$%2145
+        String passwordRe = passwordReTxt.getText().toString(); // abcDe23@#$%2145
         String name = nameTxt.getText().toString();
         String mobile = mobileTxt.getText().toString();
         String gender = genderSpinner.getSelectedItem().toString();
@@ -127,6 +127,11 @@ public class SignUpActivity extends AppCompatActivity {
             mobileTxt.requestFocus();
             return;
         }
+
+        // encrypt password
+        // set request model object.
+
+
     }
 
     /**
