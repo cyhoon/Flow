@@ -106,6 +106,9 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                 switch (status) {
                     case 200: // 성공
                         ToastSingleton.showMessage(getApplicationContext(), rf.getMessage());
+                        /**
+                         * SQL lite에 Token과 자신의 정보를 입력
+                         */
 //                        Intent goLoginIntent = new Intent(SignInActivity.this, MainActivity.class);
 //                        startActivity(goLoginIntent); // 메인 액티비티로 이동
 //                        finish();

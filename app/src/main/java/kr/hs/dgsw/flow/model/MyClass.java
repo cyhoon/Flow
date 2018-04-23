@@ -1,9 +1,16 @@
 package kr.hs.dgsw.flow.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class MyClass {
+    @SerializedName("grade")
     private int grade;
-    private int class_room;
-    private int class_number;
+
+    @SerializedName("class_room")
+    private int classRoom;
+
+    @SerializedName("class_number")
+    private int classNumber;
 
     public int getGrade() {
         return grade;
@@ -13,19 +20,19 @@ public class MyClass {
         this.grade = grade;
     }
 
-    public int getClass_room() {
-        return class_room;
+    public int getClassRoom() {
+        return classRoom;
     }
 
-    public void setClass_room(int class_room) {
-        this.class_room = class_room;
+    public void setClassRoom(int classRoom) {
+        this.classRoom = classRoom;
     }
 
-    public int getClass_number() {
-        return class_number;
+    public int getClassNumber() {
+        return classNumber;
     }
 
-    public void setClass_number(int class_number) {
-        this.class_number = class_number;
+    public void setClassNumber(int classNumber) {
+        this.classNumber = classNumber;
     }
 }

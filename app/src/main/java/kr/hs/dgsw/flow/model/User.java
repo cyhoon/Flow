@@ -1,11 +1,24 @@
 package kr.hs.dgsw.flow.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class User {
+    @SerializedName("email")
     private String email;
+
+    @SerializedName("name")
     private String name;
+
+    @SerializedName("gender")
     private String gender;
+
+    @SerializedName("mobile")
     private String mobile;
+
+    @SerializedName("auth")
     private int auth;
+
+    @SerializedName("my_class")
     private MyClass myClass;
 
     public String getEmail() {
