@@ -29,5 +29,5 @@ public interface FlowService {
     Call<ResponseFormat> signUp(@Body UserSignUp userSignUp);
 
     @POST("/auth/signin")
-    Call<ResponseFormat> signIn(@Body UserSignIn userSignIn);
+    Call<UserResponseFormat> signIn(@Body UserSignIn userSignIn);
 }

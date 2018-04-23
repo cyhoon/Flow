@@ -5,29 +5,41 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import kr.hs.dgsw.flow.R;
+import kr.hs.dgsw.flow.helper.Encryption;
+import kr.hs.dgsw.flow.helper.ToastSingleton;
+import kr.hs.dgsw.flow.helper.Validation;
+import kr.hs.dgsw.flow.interfaces.FlowService;
+import kr.hs.dgsw.flow.model.request.UserSignIn;
+import kr.hs.dgsw.flow.model.response.UserResponseFormat;
+import kr.hs.dgsw.flow.network.RetrofitSingleton;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SignInActivity extends AppCompatActivity implements View.OnClickListener{
 
+    private Button signInBtn; // 로그인 버튼
+
     private TextView goSignup;
-    private Button loginBtn;
     private ProgressBar progressBar;
+
+    private EditText emailTxt;
+    private EditText passwordTxt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
-        /*
-        * UI Component 등록
-        */
-        goSignup = findViewById(R.id.goSignup);
-        loginBtn = findViewById(R.id.loginBtn);
-        progressBar = findViewById(R.id.progressBar);
+        setViewId();
 
+        signInBtn.setOnClickListener(this);
         goSignup.setOnClickListener(this);
     }
 
@@ -42,9 +54,84 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 //        progressBar.setVisibility(View.GONE);
     }
 
+    public void setViewId() {
+        signInBtn = findViewById(R.id.signInBtn);
+        goSignup = findViewById(R.id.goSignup);
+
+        progressBar = findViewById(R.id.progressBar);
+
+        emailTxt = findViewById(R.id.emailTxt);
+        passwordTxt = findViewById(R.id.passwordTxt);
+    }
+
+    public void verifySignInData() {
+        String email = emailTxt.getText().toString();
+        String password = passwordTxt.getText().toString();
+
+        if (!Validation.isValidEmail(email)) {
+            String message = "이메일이 올바르지 않습니다.";
+            ToastSingleton.showMessage(getApplicationContext(), message);
+            emailTxt.requestFocus();
+            return;
+        }
+
+        if (Validation.isBeEmptyValue(password)) {
+            String message = "비밀번호가 입력되지 않았습니다.";
+            ToastSingleton.showMessage(getApplicationContext(), message);
+            passwordTxt.requestFocus();
+            return;
+        }
+
+        // encrypt password
+        password = Encryption.getSHA512(password);
+
+        UserSignIn userSignIn = new UserSignIn();
+        userSignIn.setEmail(email);
+        userSignIn.setPw(password);
+
+        signIn(userSignIn);
+    }
+
+    public void signIn(UserSignIn userSignInData) {
+        FlowService service = RetrofitSingleton.getInstance();
+        Call<UserResponseFormat> request = service.signIn(userSignInData);
+
+        request.enqueue(new Callback<UserResponseFormat>() {
+            @Override
+            public void onResponse(Call<UserResponseFormat> call, Response<UserResponseFormat> response) {
+                UserResponseFormat rf = response.body();
+
+                int status = rf.getStatus();
+
+                switch (status) {
+                    case 200: // 성공
+                        ToastSingleton.showMessage(getApplicationContext(), rf.getMessage());
+//                        Intent goLoginIntent = new Intent(SignInActivity.this, MainActivity.class);
+//                        startActivity(goLoginIntent); // 메인 액티비티로 이동
+//                        finish();
+                        break;
+                    case 400: // 요청파라미터 에러
+                        ToastSingleton.showMessage(getApplicationContext(), rf.getMessage());
+                        break;
+                    case 401: // 이메일 또는 비밀번호가 일치하지 않는 경우
+                        ToastSingleton.showMessage(getApplicationContext(), rf.getMessage());
+                        break;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserResponseFormat> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "서버 에러", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
+            case R.id.signInBtn: // 로그인 버튼
+                verifySignInData(); // 로그인 데이터 검사 및 로그인
+                break;
             case R.id.goSignup: // 회원가입 액티비티 이동
                 Intent goSignupIntent = new Intent(getApplicationContext(), SignUpActivity.class);
                 startActivity(goSignupIntent);
