@@ -3,7 +3,7 @@ package kr.hs.dgsw.flow.helper;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 
-public class encryption {
+public class Encryption {
     public static String getSHA512(String input) {
         String toReturn = null;
 

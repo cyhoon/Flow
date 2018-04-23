@@ -1,5 +1,6 @@
 package kr.hs.dgsw.flow.activity;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,6 +17,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import kr.hs.dgsw.flow.R;
+import kr.hs.dgsw.flow.helper.Encryption;
+import kr.hs.dgsw.flow.helper.ToastSingleton;
+import kr.hs.dgsw.flow.helper.Validation;
 import kr.hs.dgsw.flow.interfaces.FlowService;
 import kr.hs.dgsw.flow.model.ResponseFormat;
 import kr.hs.dgsw.flow.model.User;
@@ -88,49 +93,58 @@ public class SignUpActivity extends AppCompatActivity {
                 classRoom = "1";
         }
 
-//        if (!Validation.isValidEmail(email)) {
-//            Toast.makeText(getApplicationContext(), "이메일이 올바르지 않습니다.", Toast.LENGTH_SHORT).show();
-//            emailTxt.requestFocus();
-//            return;
-//        }
-//
-//        if (!Validation.isValidPassword(password)) {
-//            Toast.makeText(getApplicationContext(), "비밀번호는 ( 소문자, 대문자, 특수문자 포함해서 8~16 이어야 합니다. )", Toast.LENGTH_SHORT).show();
-//            passwordTxt.requestFocus();
-//            return;
-//        }
-//
-//        if (Validation.isBeEmptyValue(password)) {
-//            Toast.makeText(getApplicationContext(), "비밀번호가 입력되지 않았습니다.", Toast.LENGTH_SHORT).show();
-//            passwordTxt.requestFocus();
-//            return;
-//        }
-//
-//        if (Validation.isBeEmptyValue(passwordRe)) {
-//            Toast.makeText(getApplicationContext(), "비밀번호 재입력이 입력되지 않았습니다.", Toast.LENGTH_SHORT).show();
-//            passwordReTxt.requestFocus();
-//            return;
-//        }
-//
-//        if (!Validation.isComparingPassword(password, passwordRe)) {
-//            Toast.makeText(getApplicationContext(), "비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
-//            passwordReTxt.requestFocus();
-//            return;
-//        }
-//
-//        if (Validation.isBeEmptyValue(name)) {
-//            Toast.makeText(getApplicationContext(), "이름이 입력되지 않았습니다.", Toast.LENGTH_SHORT).show();
-//            nameTxt.requestFocus();
-//            return;
-//        }
-//
-//        if (Validation.isBeEmptyValue(mobile)) {
-//            Toast.makeText(getApplicationContext(), "전화 번호가 입력되지 않았습니다.", Toast.LENGTH_SHORT).show();
-//            mobileTxt.requestFocus();
-//            return;
-//        }
+        if (!Validation.isValidEmail(email)) {
+            String message = "이메일이 올바르지 않습니다.";
+            ToastSingleton.showMessage(getApplicationContext(), message);
+            emailTxt.requestFocus();
+            return;
+        }
+
+        if (!Validation.isValidPassword(password)) {
+            String message = "비밀번호는 ( 소문자, 대문자, 특수문자 포함해서 8~16 이어야 합니다. )";
+            ToastSingleton.showMessage(getApplicationContext(), message);
+            passwordTxt.requestFocus();
+            return;
+        }
+
+        if (Validation.isBeEmptyValue(password)) {
+            String message = "비밀번호가 입력되지 않았습니다.";
+            ToastSingleton.showMessage(getApplicationContext(), message);
+            passwordTxt.requestFocus();
+            return;
+        }
+
+        if (Validation.isBeEmptyValue(passwordRe)) {
+            String message = "비밀번호 재입력이 입력되지 않았습니다.";
+            ToastSingleton.showMessage(getApplicationContext(), message);
+            passwordReTxt.requestFocus();
+            return;
+        }
+
+        if (!Validation.isComparingPassword(password, passwordRe)) {
+            String message = "비밀번호가 일치하지 않습니다.";
+            ToastSingleton.showMessage(getApplicationContext(), message);
+            passwordReTxt.requestFocus();
+            return;
+        }
+
+        if (Validation.isBeEmptyValue(name)) {
+            String message = "이름이 입력되지 않았습니다.";
+            ToastSingleton.showMessage(getApplicationContext(), message);
+            nameTxt.requestFocus();
+            return;
+        }
+
+        if (Validation.isBeEmptyValue(mobile)) {
+            String message = "전화 번호가 입력되지 않았습니다.";
+            ToastSingleton.showMessage(getApplicationContext(), message);
+            mobileTxt.requestFocus();
+            return;
+        }
 
         // encrypt password
+        password = Encryption.getSHA512(password);
+
         // set request model object.
         UserSignUp userSignUpData = new UserSignUp();
         userSignUpData.setEmail(email);
@@ -216,21 +230,27 @@ public class SignUpActivity extends AppCompatActivity {
             public void onResponse(Call<ResponseFormat> call, Response<ResponseFormat> response) {
                 ResponseFormat rf = response.body();
 
-                switch (rf.getStatus()) {
+                int status = rf.getStatus();
+
+                switch (status) {
                     case 200: // 성공
+                        ToastSingleton.showMessage(getApplicationContext(), rf.getMessage());
+                        Intent goLoginIntent = new Intent(SignUpActivity.this, SignInActivity.class);
+                        startActivity(goLoginIntent); // 로그인 액티비티로 이동
+                        finish();
                         break;
-                    case 400:
+                    case 400: // 요청파라미터 에러
+                        ToastSingleton.showMessage(getApplicationContext(), rf.getMessage());
                         break;
-                    case 401:
-                        break;
-                    default:
+                    case 409: // 해당 이메일로 계정이 존재
+                        ToastSingleton.showMessage(getApplicationContext(), rf.getMessage());
                         break;
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseFormat> call, Throwable t) {
-
+                Toast.makeText(getApplicationContext(), "서버 에러", Toast.LENGTH_SHORT).show();
             }
         });
     }
