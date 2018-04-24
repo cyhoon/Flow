@@ -3,6 +3,7 @@ package kr.hs.dgsw.flow.activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,11 +12,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import kr.hs.dgsw.flow.R;
+import kr.hs.dgsw.flow.database.DBManager;
+import kr.hs.dgsw.flow.database.DatabaseHelper;
 import kr.hs.dgsw.flow.helper.Encryption;
 import kr.hs.dgsw.flow.helper.ToastSingleton;
 import kr.hs.dgsw.flow.helper.Validation;
 import kr.hs.dgsw.flow.interfaces.FlowService;
 import kr.hs.dgsw.flow.model.request.UserSignIn;
+import kr.hs.dgsw.flow.model.response.UserResponseData;
 import kr.hs.dgsw.flow.model.response.UserResponseFormat;
 import kr.hs.dgsw.flow.network.RetrofitSingleton;
 import retrofit2.Call;
@@ -107,8 +111,16 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                     case 200: // 성공
                         ToastSingleton.showMessage(getApplicationContext(), rf.getMessage());
                         /**
-                         * SQL lite에 Token과 자신의 정보를 입력
+                         * SQLite에 Token과 자신의 정보를 입력
                          */
+
+                        try{
+                            DatabaseHelper dbManager = new DatabaseHelper(getApplicationContext());
+                            dbManager.saveMyProfile(rf);
+                        } catch (Exception e) {
+                            Log.d("error", e.toString());
+                        }
+//                        dbManager.saveMyProfile(rf);
 //                        Intent goLoginIntent = new Intent(SignInActivity.this, MainActivity.class);
 //                        startActivity(goLoginIntent); // 메인 액티비티로 이동
 //                        finish();
