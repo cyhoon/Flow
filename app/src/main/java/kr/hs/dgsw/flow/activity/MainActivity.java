@@ -7,6 +7,12 @@ import android.view.View;
 
 import kr.hs.dgsw.flow.R;
 
+/**
+ * 다음에 해야할 작업
+ *
+ * 1. 메인으로 이동
+ */
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -28,5 +34,10 @@ public class MainActivity extends AppCompatActivity {
     public void goSignUpIntent(View v) {
         Intent goLoginIntent = new Intent(MainActivity.this, SignUpActivity.class);
         startActivity(goLoginIntent);
+    }
+
+    public void goHomeIntent(View v) {
+        Intent goHomeIntent = new Intent(MainActivity.this, HomeActivity.class);
+        startActivity(goHomeIntent);
     }
 }
