@@ -110,20 +110,17 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                 switch (status) {
                     case 200: // 성공
                         ToastSingleton.showMessage(getApplicationContext(), rf.getMessage());
-                        /**
-                         * SQLite에 Token과 자신의 정보를 입력
-                         */
-
                         try{
                             DatabaseHelper dbManager = new DatabaseHelper(getApplicationContext());
-                            dbManager.saveMyProfile(rf);
+                            dbManager.deleteMyProfile(); // 계정 DB 삭제
+                            dbManager.saveMyProfile(rf); // 계정 DB 등록
+
+                            Intent schoolMealsIntent = new Intent(SignInActivity.this, HomeActivity.class);
+                            startActivity(schoolMealsIntent);
+                            finish();
                         } catch (Exception e) {
                             Log.d("error", e.toString());
                         }
-//                        dbManager.saveMyProfile(rf);
-//                        Intent goLoginIntent = new Intent(SignInActivity.this, MainActivity.class);
-//                        startActivity(goLoginIntent); // 메인 액티비티로 이동
-//                        finish();
                         break;
                     case 400: // 요청파라미터 에러
                         ToastSingleton.showMessage(getApplicationContext(), rf.getMessage());

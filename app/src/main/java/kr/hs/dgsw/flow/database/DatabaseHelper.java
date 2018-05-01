@@ -64,7 +64,7 @@ public class DatabaseHelper  extends SQLiteOpenHelper{
 
 
         final SQLiteDatabase db = getWritableDatabase();
-        final String sql = "SELECT * FROM MY_RPOFILE";
+        final String sql = "SELECT * FROM MY_PROFILE LIMIT 1";
         final Cursor cursor = db.rawQuery(sql, null);
 
         cursor.moveToNext();
@@ -90,7 +90,7 @@ public class DatabaseHelper  extends SQLiteOpenHelper{
     public void updateMyToken(String token, String email) {
         SQLiteDatabase db = getWritableDatabase();
 
-        String sql = "UPDATE MY_RPOFILE SET token=? WHERE email=?;";
+        String sql = "UPDATE MY_PROFILE SET token=? WHERE email=?;";
         final SQLiteStatement updateStmt = db.compileStatement(sql);
         updateStmt.clearBindings();
         updateStmt.bindString(1, token);
@@ -101,7 +101,7 @@ public class DatabaseHelper  extends SQLiteOpenHelper{
 
     public void deleteMyProfile() {
         final SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("DELETE FROM MY_RPOFILE;");
+        db.execSQL("DELETE FROM MY_PROFILE;");
         db.close();
     }
 }

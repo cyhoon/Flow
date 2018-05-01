@@ -24,19 +24,21 @@
         android:id="@+id/signInBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:onClick="goSignInIntent"
         android:text="로그인 하기"
-        tools:layout_editor_absoluteX="28dp"
-        tools:layout_editor_absoluteY="74dp" />
+        app:layout_constraintTop_toBottomOf="@+id/button"
+        tools:layout_editor_absoluteX="28dp" />
 
     <Button
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:onClick="goSignUpIntent"
         android:text="회원가입"
-        tools:layout_editor_absoluteX="28dp"
-        tools:layout_editor_absoluteY="16dp" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="28dp" />
 
     <Button
         android:id="@+id/button2"
@@ -52,8 +54,9 @@
         android:id="@+id/home"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:onClick="goHomeIntent"
         android:text="홈으로 가기"
-        tools:layout_editor_absoluteX="28dp"
-        tools:layout_editor_absoluteY="172dp" />
+        app:layout_constraintTop_toBottomOf="@+id/signInBtn"
+        tools:layout_editor_absoluteX="28dp" />
 </android.support.constraint.ConstraintLayout>
