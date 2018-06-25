@@ -112,6 +112,22 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             startActivity(schoolMealsIntent);
         } else if (id == R.id.logout) {
             // 로그아웃
+
+            /**
+             * 로그아웃 로직
+             *
+             * 데이터 베이스 삭제 하면 될 듯
+             */
+            try {
+                DatabaseHelper dbManager = new DatabaseHelper(getApplicationContext());
+                dbManager.deleteMyProfile();
+
+                Intent goLoginIntent = new Intent(HomeActivity.this, SignInActivity.class);
+                startActivity(goLoginIntent);
+                finish();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
