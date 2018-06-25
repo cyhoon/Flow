@@ -92,6 +92,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         UserSignIn userSignIn = new UserSignIn();
         userSignIn.setEmail(email);
         userSignIn.setPw(password);
+        userSignIn.setRegistrationToken("token");
 
         signIn(userSignIn);
     }

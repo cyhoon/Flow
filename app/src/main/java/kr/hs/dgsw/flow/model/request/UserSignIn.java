@@ -9,6 +9,9 @@ public class UserSignIn {
     @SerializedName("pw")
     private String pw;
 
+    @SerializedName("registration_token")
+    private String registrationToken;
+
     public String getEmail() {
         return email;
     }
@@ -23,5 +26,13 @@ public class UserSignIn {
 
     public void setPw(String pw) {
         this.pw = pw;
+    }
+
+    public String getRegistrationToken() {
+        return registrationToken;
+    }
+
+    public void setRegistrationToken(String registrationToken) {
+        this.registrationToken = registrationToken;
     }
 }

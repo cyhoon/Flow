@@ -5,7 +5,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitSingleton {
-    private static String baseUrl = "http://10.80.163.99:4000/";
+    private static String baseUrl = "http://flow.cafe24app.com/";
     private static Retrofit retrofit = null;
     private static FlowService flowService = null;
 
